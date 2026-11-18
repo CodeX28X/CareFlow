@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CareFlow.Desktop.ViewModels"
+             xmlns:patient="using:CareFlow.Application.Patients"
+             x:Class="CareFlow.Desktop.Views.NewBookingView"
+             x:DataType="vm:NewBookingViewModel">
+    <UserControl.Styles>
+        <!-- Fluent themes can override button colors on hover/press. Keep action buttons legible in every state. -->
+        <Style Selector="Button.careflowAction">
+            <Setter Property="Background" Value="#172C40" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#172C40" />
+        </Style>
+        <Style Selector="Button.careflowAction:pointerover">
+            <Setter Property="Background" Value="#294860" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#294860" />
+        </Style>
+        <Style Selector="Button.careflowAction:pressed">
+            <Setter Property="Background" Value="#102435" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+        <Style Selector="Button.careflowAction:disabled">
+            <Setter Property="Background" Value="#94A3B8" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
+        <StackPanel Grid.Row="0" Spacing="7">
+            <TextBlock Text="Patient" FontWeight="SemiBold" />
+            <ComboBox ItemsSource="{Binding Patients}" SelectedItem="{Binding SelectedPatient}" Width="350" HorizontalAlignment="Left">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="patient:PatientSummary">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{Binding PatientCode}" Foreground="#172C40" />
+                            <TextBlock Text="{Binding FullName}" Foreground="#172C40" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Spacing="7">
+            <TextBlock Text="Booking date" FontWeight="SemiBold" />
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <DatePicker SelectedDate="{Binding BookingDate}" Width="220" />
+                <Button Content="Refresh services" Command="{Binding LoadServicesCommand}" Classes="careflowAction" />
+            </StackPanel>
+        </StackPanel>
+        <TextBlock Grid.Row="2" Text="Select 1 to 3 different services. Unavailable services are disabled."
+                   Foreground="#64748B" TextWrapping="Wrap" />
+        <ScrollViewer Grid.Row="3">
+            <ItemsControl ItemsSource="{Binding Services}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:BookingServiceChoice">
+                        <Border Background="#F3F7FA" CornerRadius="7" Padding="10" Margin="0,0,0,7">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <CheckBox Grid.Column="0" Content="{Binding Name}" IsChecked="{Binding IsSelected}" IsEnabled="{Binding CanBook}" Foreground="#172C40" />
+                                <TextBlock Grid.Column="1" Text="{Binding Remaining, StringFormat='Remaining: {0}'}" Foreground="#475569" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <StackPanel Grid.Row="4" Spacing="8">
+            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Foreground="#172C40" />
+            <Button Content="Confirm Booking" Classes="careflowAction" Command="{Binding ConfirmCommand}" IsEnabled="{Binding !IsBusy}" HorizontalAlignment="Left" Padding="18,11" />
+            <TextBlock Text="A booking is confirmed only after the database transaction commits." Foreground="#64748B" FontSize="11" />
+        </StackPanel>
+    </Grid>
+</UserControl>

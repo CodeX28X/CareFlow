@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CareFlow.Desktop.ViewModels"
+             xmlns:booking="using:CareFlow.Application.Bookings"
+             x:Class="CareFlow.Desktop.Views.BookingHistoryView"
+             x:DataType="vm:BookingHistoryViewModel">
+    <UserControl.Styles>
+        <!-- Fluent themes can override button colors on hover/press. Keep action buttons legible in every state. -->
+        <Style Selector="Button.careflowAction">
+            <Setter Property="Background" Value="#172C40" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#172C40" />
+        </Style>
+        <Style Selector="Button.careflowAction:pointerover">
+            <Setter Property="Background" Value="#294860" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#294860" />
+        </Style>
+        <Style Selector="Button.careflowAction:pressed">
+            <Setter Property="Background" Value="#102435" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+        <Style Selector="Button.careflowAction:disabled">
+            <Setter Property="Background" Value="#94A3B8" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+        <Button Grid.Row="0" Content="Refresh history" Command="{Binding RefreshCommand}" Classes="careflowAction" HorizontalAlignment="Left" />
+        <StackPanel Grid.Row="1" Spacing="6">
+            <TextBlock Text="Loading bookings..." IsVisible="{Binding IsLoading}" Foreground="#2563EB" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Foreground="#B91C1C" TextWrapping="Wrap" />
+            <TextBlock Text="No confirmed bookings yet." IsVisible="{Binding IsEmpty}" Foreground="#64748B" />
+        </StackPanel>
+        <ListBox Grid.Row="2" ItemsSource="{Binding Bookings}" SelectedItem="{Binding SelectedBooking}">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="booking:BookingDetails">
+                    <StackPanel Spacing="3" Margin="4,6">
+                        <TextBlock Text="{Binding BookingId, StringFormat='Booking #{0}'}" FontWeight="Bold" Foreground="#172C40" />
+                        <TextBlock Text="{Binding PatientName}" Foreground="#172C40" />
+                        <TextBlock Text="{Binding BookingDate}" Foreground="#64748B" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <ContentControl Grid.Row="3" Content="{Binding SelectedBooking}">
+            <ContentControl.ContentTemplate>
+                <DataTemplate x:DataType="booking:BookingDetails">
+                    <Border Background="#F3F7FA" CornerRadius="8" Padding="12" MinHeight="90">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="Selected booking details" FontWeight="Bold" Foreground="#172C40" />
+                            <TextBlock Text="{Binding PatientName}" Foreground="#172C40" />
+                            <TextBlock Text="{Binding PatientCode}" Foreground="#172C40" />
+                            <TextBlock Text="{Binding BookingDate}" Foreground="#172C40" />
+                            <ItemsControl ItemsSource="{Binding Services}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="booking:BookedService">
+                                        <TextBlock Text="{Binding ServiceName}" Margin="0,2" Foreground="#172C40" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ContentControl.ContentTemplate>
+        </ContentControl>
+    </Grid>
+</UserControl>
