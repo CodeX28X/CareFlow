@@ -170,7 +170,7 @@ public sealed class BookingIntegrationTests
             var before = await availability.GetAvailabilityAsync(date);
 
             var ecgBefore = Assert.Single(
-                before.Where(s => s.ServiceId == 4));
+                before, s => s.ServiceId == 4);
 
             Assert.Equal(3, ecgBefore.RemainingCapacity);
 
@@ -197,7 +197,7 @@ public sealed class BookingIntegrationTests
             var after = await availability.GetAvailabilityAsync(date);
 
             var ecgAfter = Assert.Single(
-                after.Where(s => s.ServiceId == 4));
+                after, s => s.ServiceId == 4);
 
             Assert.Equal(0, ecgAfter.RemainingCapacity);
         }
@@ -311,6 +311,7 @@ public sealed class BookingIntegrationTests
     [Fact]
     public async Task DatabaseFailure_RollsBackEntireBooking()
     {
+
         DateOnly date = PostgreSqlTestDatabase.NewTestDate();
         bool triggerInstalled = false;
 
@@ -387,27 +388,23 @@ public sealed class BookingIntegrationTests
         }
         finally
         {
-            // Always attempt to remove the test trigger,
-            // including when its creation was interrupted.
-            await using var db = _database.CreateDbContext();
-
-            try
+            if (triggerInstalled)
             {
-                await db.Database.ExecuteSqlRawAsync("""
-                    DROP TRIGGER IF EXISTS
-                    careflow_test_reject_insert
-                    ON public."BookingServices";
-                    """);
+                await using var db = _database.CreateDbContext();
 
                 await db.Database.ExecuteSqlRawAsync("""
-                    DROP FUNCTION IF EXISTS
-                    public.careflow_test_reject_booking_service();
-                    """);
+            DROP TRIGGER IF EXISTS
+            careflow_test_reject_insert
+            ON public."BookingServices";
+            """);
+
+                await db.Database.ExecuteSqlRawAsync("""
+            DROP FUNCTION IF EXISTS
+            public.careflow_test_reject_booking_service();
+            """);
             }
-            finally
-            {
-                await _database.CleanupDateAsync(date);
-            }
+
+            await _database.CleanupDateAsync(date);
         }
     }
 }
