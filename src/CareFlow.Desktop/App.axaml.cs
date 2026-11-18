@@ -1,4 +1,3 @@
-
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -14,10 +13,7 @@ public partial class App : Avalonia.Application
 {
     private ServiceProvider? _serviceProvider;
 
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -25,7 +21,6 @@ public partial class App : Avalonia.Application
         {
             string? connectionString =
                 Environment.GetEnvironmentVariable("CAREFLOW_CONNECTION_STRING");
-
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 desktop.MainWindow = new ConfigurationErrorWindow();
@@ -33,28 +28,17 @@ public partial class App : Avalonia.Application
             else
             {
                 var services = new ServiceCollection();
-
-                // Register existing backend services.
                 services.AddCareFlowInfrastructure(connectionString);
-
-                // Register desktop ViewModels.
+                services.AddSingleton<AvailabilityViewModel>();
+                services.AddSingleton<NewBookingViewModel>();
+                services.AddSingleton<BookingHistoryViewModel>();
                 services.AddSingleton<MainViewModel>();
-
-                // Register desktop windows.
                 services.AddSingleton<MainWindow>();
-
-                // Build the dependency injection container.
                 _serviceProvider = services.BuildServiceProvider();
-
-                // Resolve MainWindow and its dependencies.
-                desktop.MainWindow =
-                    _serviceProvider.GetRequiredService<MainWindow>();
-
-                // Dispose registered services when the application exits.
+                desktop.MainWindow = _serviceProvider.GetRequiredService<MainWindow>();
                 desktop.Exit += (_, _) => _serviceProvider?.Dispose();
             }
         }
-
         base.OnFrameworkInitializationCompleted();
     }
 }

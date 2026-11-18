@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CareFlow.Desktop.ViewModels"
+             xmlns:model="using:CareFlow.Application.Availability"
+             x:Class="CareFlow.Desktop.Views.AvailabilityView"
+             x:DataType="vm:AvailabilityViewModel">
+    <UserControl.Styles>
+        <!-- Fluent themes can override button colors on hover/press. Keep action buttons legible in every state. -->
+        <Style Selector="Button.careflowAction">
+            <Setter Property="Background" Value="#172C40" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#172C40" />
+        </Style>
+        <Style Selector="Button.careflowAction:pointerover">
+            <Setter Property="Background" Value="#294860" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#294860" />
+        </Style>
+        <Style Selector="Button.careflowAction:pressed">
+            <Setter Property="Background" Value="#102435" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+        <Style Selector="Button.careflowAction:disabled">
+            <Setter Property="Background" Value="#94A3B8" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+    </UserControl.Styles>
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="12">
+        <StackPanel Grid.Row="0" Spacing="8">
+            <TextBlock Text="Booking date" FontWeight="SemiBold" />
+            <StackPanel Orientation="Horizontal" Spacing="14">
+                <DatePicker SelectedDate="{Binding SelectedDate}" Width="220" />
+                <Button Content="Refresh availability" Command="{Binding RefreshCommand}" Classes="careflowAction" />
+            </StackPanel>
+            <TextBlock Text="Remaining slots are based on confirmed bookings. Final availability is rechecked when you confirm a booking."
+                       TextWrapping="Wrap" Foreground="#64748B" FontSize="12" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Spacing="6">
+            <TextBlock Text="Loading availability..." IsVisible="{Binding IsLoading}" Foreground="#2563EB" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Foreground="#B91C1C" TextWrapping="Wrap" />
+            <TextBlock Text="No diagnostic services were found." IsVisible="{Binding IsEmpty}" Foreground="#64748B" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="2">
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="model:ServiceAvailability">
+                        <Border Margin="0,0,0,9" Padding="15" CornerRadius="8" Background="#F3F7FA" BorderBrush="#E2E8F0" BorderThickness="1">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="6">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ServiceName}" FontSize="16" FontWeight="SemiBold" Foreground="#172C40" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding StatusText}" FontWeight="Bold" Foreground="#176B55" />
+                                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="Daily capacity:" Foreground="#64748B" />
+                                    <TextBlock Text="{Binding DailyCapacity}" Foreground="#172C40" />
+                                    <TextBlock Text="  Confirmed:" Foreground="#64748B" />
+                                    <TextBlock Text="{Binding ConfirmedCount}" Foreground="#172C40" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="Remaining:" Foreground="#64748B" />
+                                    <TextBlock Text="{Binding RemainingCapacity}" FontWeight="Bold" Foreground="#172C40" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

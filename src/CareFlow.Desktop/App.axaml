@@ -2,8 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="CareFlow.Desktop.App"
              xmlns:local="using:CareFlow.Desktop"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             RequestedThemeVariant="Light">
+             <!-- CareFlow uses fixed light surface colors. Pin Fluent controls to Light so popups, checkboxes, and list selection remain readable regardless of Windows dark mode. -->
 
     <Application.DataTemplates>
         <local:ViewLocator />

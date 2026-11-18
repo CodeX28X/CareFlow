@@ -1,141 +1,58 @@
-
-using CareFlow.Application.Availability;
-using CareFlow.Application.Interfaces;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace CareFlow.Desktop.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    private readonly IAvailabilityService _availabilityService;
+    public AvailabilityViewModel Availability { get; }
+    public NewBookingViewModel NewBooking { get; }
+    public BookingHistoryViewModel History { get; }
 
-    public MainViewModel(IAvailabilityService availabilityService)
+    [ObservableProperty] private ViewModelBase? currentPage;
+    [ObservableProperty] private string currentPageTitle = "Service Availability";
+    [ObservableProperty] private string currentPageDescription = "Review remaining capacity for a selected date.";
+    [ObservableProperty] private string currentNavigation = "Availability";
+
+    public MainViewModel(AvailabilityViewModel availability,
+        NewBookingViewModel newBooking, BookingHistoryViewModel history)
     {
-        _availabilityService = availabilityService;
-
-        // Load today's availability when the dashboard opens.
-        _ = RefreshAvailabilityAsync();
+        Availability = availability;
+        NewBooking = newBooking;
+        History = history;
+        CurrentPage = Availability;
     }
 
-    [ObservableProperty]
-    private string currentPageTitle = "Service Availability";
-
-    [ObservableProperty]
-    private string currentPageDescription =
-        "Monitor diagnostic service availability and remaining capacity.";
-
-    [ObservableProperty]
-    private string currentNavigation = "Availability";
-
-    [ObservableProperty]
-    private string connectionStatus = "Checking database...";
-
-    [ObservableProperty]
-    private DateTimeOffset? selectedDate = DateTimeOffset.Now;
-
-    [ObservableProperty]
-    private bool isLoading;
-
-    [ObservableProperty]
-    private string errorMessage = string.Empty;
-
-    public ObservableCollection<ServiceAvailability> AvailabilityItems
-    { get; } = new();
-
-    public bool HasError =>
-        !string.IsNullOrWhiteSpace(ErrorMessage);
-
-    public bool HasNoAvailability =>
-        !IsLoading && !HasError && AvailabilityItems.Count == 0;
-
-    partial void OnSelectedDateChanged(DateTimeOffset? value)
-    {
-        _ = RefreshAvailabilityAsync();
-    }
-
-    partial void OnErrorMessageChanged(string value)
-    {
-        OnPropertyChanged(nameof(HasError));
-        OnPropertyChanged(nameof(HasNoAvailability));
-    }
-
-    partial void OnIsLoadingChanged(bool value)
-    {
-        OnPropertyChanged(nameof(HasNoAvailability));
-    }
+    public async Task InitializeAsync() => await Availability.RefreshAsync();
 
     [RelayCommand]
-    private async Task RefreshAvailabilityAsync()
+    private async Task ShowAvailabilityAsync()
     {
-        if (SelectedDate is null)
-            return;
-
-        IsLoading = true;
-        ErrorMessage = string.Empty;
-
-        try
-        {
-            DateOnly bookingDate = DateOnly.FromDateTime(
-                SelectedDate.Value.DateTime);
-
-            var results =
-                await _availabilityService.GetAvailabilityAsync(
-                    bookingDate);
-
-            AvailabilityItems.Clear();
-
-            foreach (var item in results)
-            {
-                AvailabilityItems.Add(item);
-            }
-
-            ConnectionStatus = "Database connected";
-        }
-        catch (Exception ex)
-        {
-            AvailabilityItems.Clear();
-
-            ConnectionStatus = "Database unavailable";
-
-            ErrorMessage =
-                $"Unable to load service availability: {ex.Message}";
-        }
-        finally
-        {
-            IsLoading = false;
-
-            OnPropertyChanged(nameof(HasNoAvailability));
-        }
-    }
-
-    [RelayCommand]
-    private void ShowAvailability()
-    {
+        CurrentPage = Availability;
         CurrentNavigation = "Availability";
         CurrentPageTitle = "Service Availability";
-        CurrentPageDescription =
-            "Monitor diagnostic service availability and remaining capacity.";
+        CurrentPageDescription = "Review remaining capacity for a selected date.";
+        await Availability.RefreshAsync();
     }
 
     [RelayCommand]
-    private void ShowNewBooking()
+    private async Task ShowNewBookingAsync()
     {
+        CurrentPage = NewBooking;
         CurrentNavigation = "New Booking";
         CurrentPageTitle = "New Booking";
-        CurrentPageDescription =
-            "Create a diagnostic booking for an existing patient.";
+        CurrentPageDescription = "Select a patient, date, and up to three diagnostic services.";
+        await NewBooking.InitializeAsync();
     }
 
     [RelayCommand]
-    private void ShowHistory()
+    private async Task ShowHistoryAsync()
     {
+        CurrentPage = History;
         CurrentNavigation = "History";
         CurrentPageTitle = "Booking History";
-        CurrentPageDescription =
-            "Review previously confirmed diagnostic bookings.";
+        CurrentPageDescription = "Review confirmed bookings and their diagnostic services.";
+        await History.RefreshAsync();
     }
 }
