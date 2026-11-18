@@ -1,22 +1,184 @@
+
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:CareFlow.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d"
         x:Class="CareFlow.Desktop.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="CareFlow.Desktop">
+        Width="1100"
+        Height="720"
+        MinWidth="850"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F7FA"
+        Title="CareFlow - Diagnostic Booking Management">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
+    <Grid ColumnDefinitions="240,*">
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+        <!-- SIDEBAR -->
+        <Border Grid.Column="0"
+                Background="#172C40"
+                Padding="22">
+
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                <!-- BRAND -->
+                <StackPanel Grid.Row="0"
+                            Spacing="7"
+                            Margin="0,5,0,40">
+
+                    <TextBlock Text="CareFlow"
+                               FontSize="27"
+                               FontWeight="Bold"
+                               Foreground="#FFFFFF"/>
+
+                    <TextBlock Text="DIAGNOSTIC CENTER"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                             
+                               Foreground="#91A9BB"/>
+
+                </StackPanel>
+
+                <!-- NAVIGATION LABEL -->
+                <TextBlock Grid.Row="1"
+                           Text="WORKSPACE"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Foreground="#91A9BB"
+                           Margin="0,0,0,15"/>
+
+                <!-- NAVIGATION ITEMS -->
+                <StackPanel Grid.Row="2"
+                            Spacing="10">
+
+                    <Button Content="Service Availability"
+                            Command="{Binding ShowAvailabilityCommand}"
+                            HorizontalContentAlignment="Left"
+                            Padding="14,12"
+                            Background="#29465C"
+                            Foreground="#FFFFFF"
+                            BorderThickness="0"
+                            CornerRadius="7"/>
+
+                    <Button Content="New Booking"
+                            Command="{Binding ShowNewBookingCommand}"
+                            HorizontalContentAlignment="Left"
+                            Padding="14,12"
+                            Background="Transparent"
+                            Foreground="#D1DCE5"
+                            BorderThickness="0"
+                            CornerRadius="7"/>
+
+                    <Button Content="Booking History"
+                            Command="{Binding ShowHistoryCommand}"
+                            HorizontalContentAlignment="Left"
+                            Padding="14,12"
+                            Background="Transparent"
+                            Foreground="#D1DCE5"
+                            BorderThickness="0"
+                            CornerRadius="7"/>
+
+                </StackPanel>
+
+                <!-- FOOTER -->
+                <StackPanel Grid.Row="3"
+                            Spacing="5">
+
+                    <Border Height="1"
+                            Background="#365064"
+                            Margin="0,0,0,12"/>
+
+                    <TextBlock Text="CareFlow Desktop"
+                               Foreground="#FFFFFF"
+                               FontWeight="SemiBold"
+                               FontSize="12"/>
+
+                    <TextBlock Text="Diagnostic Booking Management"
+                               Foreground="#91A9BB"
+                               FontSize="10"/>
+
+                </StackPanel>
+
+            </Grid>
+
+        </Border>
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Column="1"
+              RowDefinitions="Auto,*"
+              Margin="32">
+
+            <!-- HEADER -->
+            <Border Grid.Row="0"
+                    Background="#FFFFFF"
+                    CornerRadius="10"
+                    Padding="24"
+                    Margin="0,0,0,24">
+
+                <StackPanel Spacing="7">
+
+                    <TextBlock Text="{Binding CurrentPageTitle}"
+                               FontSize="27"
+                               FontWeight="Bold"
+                               Foreground="#172C40"/>
+
+                    <TextBlock Text="{Binding CurrentPageDescription}"
+                               FontSize="13"
+                               Foreground="#64748B"/>
+
+                </StackPanel>
+
+            </Border>
+
+            <!-- CONTENT PLACEHOLDER -->
+            <Border Grid.Row="1"
+                    Background="#FFFFFF"
+                    CornerRadius="10"
+                    Padding="30">
+
+                <StackPanel Spacing="15"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+
+                    <TextBlock Text="Welcome to CareFlow"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="#172C40"
+                               HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="Your diagnostic booking management workspace."
+                               FontSize="13"
+                               Foreground="#64748B"
+                               HorizontalAlignment="Center"/>
+
+                    <Border Background="#E8F5F1"
+                            CornerRadius="8"
+                            Padding="15"
+                            Margin="0,10,0,0">
+
+                        <TextBlock Text="{Binding ConnectionStatus}"
+                                   Foreground="#16765B"
+                                   FontWeight="SemiBold"
+                                   FontSize="12"
+                                   HorizontalAlignment="Center"/>
+
+                    </Border>
+
+                    <TextBlock Text="Select a workspace from the sidebar to continue."
+                               FontSize="12"
+                               Foreground="#94A3B8"
+                               HorizontalAlignment="Center"
+                               Margin="0,5,0,0"/>
+
+                </StackPanel>
+
+            </Border>
+
+        </Grid>
+
+    </Grid>
 
 </Window>

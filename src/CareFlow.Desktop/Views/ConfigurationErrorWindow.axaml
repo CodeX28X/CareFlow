@@ -1,0 +1,66 @@
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="CareFlow.Desktop.Views.ConfigurationErrorWindow"
+        Width="560"
+        Height="360"
+        MinWidth="480"
+        MinHeight="320"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F7FA"
+        CanResize="False"
+        Title="CareFlow - Configuration Required">
+
+    <Border Background="#FFFFFF"
+            Margin="25"
+            CornerRadius="12"
+            Padding="30">
+
+        <StackPanel Spacing="15"
+                    VerticalAlignment="Center">
+
+            <TextBlock Text="CareFlow"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       Foreground="#172C40"/>
+
+            <TextBlock Text="Database configuration required"
+                       FontSize="19"
+                       FontWeight="SemiBold"
+                       Foreground="#B45309"/>
+
+            <TextBlock TextWrapping="Wrap"
+                       Foreground="#475569"
+                       FontSize="13"
+                       Text="CareFlow cannot start because the PostgreSQL connection string has not been configured."/>
+
+            <Border Background="#F1F5F9"
+                    CornerRadius="7"
+                    Padding="14">
+
+                <StackPanel Spacing="8">
+
+                    <TextBlock Text="Required environment variable"
+                               FontWeight="SemiBold"
+                               FontSize="12"
+                               Foreground="#334155"/>
+
+                    <TextBlock Text="CAREFLOW_CONNECTION_STRING"
+                               FontFamily="Consolas"
+                               FontSize="13"
+                               Foreground="#0F766E"/>
+
+                </StackPanel>
+
+            </Border>
+
+            <TextBlock TextWrapping="Wrap"
+                       Foreground="#64748B"
+                       FontSize="12"
+                       Text="Configure the variable in Windows Environment Variables, then restart CareFlow."/>
+
+        </StackPanel>
+
+    </Border>
+
+</Window>
