@@ -1,22 +1,294 @@
+
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:CareFlow.Desktop.ViewModels"
+        xmlns:availability="using:CareFlow.Application.Availability"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d"
         x:Class="CareFlow.Desktop.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="CareFlow.Desktop">
+        Width="1100"
+        Height="720"
+        MinWidth="850"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F7FA"
+        Title="CareFlow - Diagnostic Booking Management">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
+    <Grid ColumnDefinitions="240,*">
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+        <!-- SIDEBAR -->
+        <Border Grid.Column="0"
+                Background="#172C40"
+                Padding="22">
+
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+                <StackPanel Grid.Row="0"
+                            Spacing="7"
+                            Margin="0,5,0,40">
+
+                    <TextBlock Text="CareFlow"
+                               FontSize="27"
+                               FontWeight="Bold"
+                               Foreground="#FFFFFF"/>
+
+                    <TextBlock Text="DIAGNOSTIC CENTER"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="#91A9BB"/>
+
+                </StackPanel>
+
+                <TextBlock Grid.Row="1"
+                           Text="WORKSPACE"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Foreground="#91A9BB"
+                           Margin="0,0,0,15"/>
+
+                <StackPanel Grid.Row="2"
+                            Spacing="10">
+
+                    <Button Content="Service Availability"
+                            Command="{Binding ShowAvailabilityCommand}"
+                            HorizontalContentAlignment="Left"
+                            Padding="14,12"
+                            Background="#29465C"
+                            Foreground="#FFFFFF"
+                            BorderThickness="0"
+                            CornerRadius="7"/>
+
+                    <Button Content="New Booking"
+                            Command="{Binding ShowNewBookingCommand}"
+                            HorizontalContentAlignment="Left"
+                            Padding="14,12"
+                            Background="Transparent"
+                            Foreground="#D1DCE5"
+                            BorderThickness="0"
+                            CornerRadius="7"/>
+
+                    <Button Content="Booking History"
+                            Command="{Binding ShowHistoryCommand}"
+                            HorizontalContentAlignment="Left"
+                            Padding="14,12"
+                            Background="Transparent"
+                            Foreground="#D1DCE5"
+                            BorderThickness="0"
+                            CornerRadius="7"/>
+
+                </StackPanel>
+
+                <StackPanel Grid.Row="3"
+                            Spacing="5">
+
+                    <Border Height="1"
+                            Background="#365064"
+                            Margin="0,0,0,12"/>
+
+                    <TextBlock Text="CareFlow Desktop"
+                               Foreground="#FFFFFF"
+                               FontWeight="SemiBold"
+                               FontSize="12"/>
+
+                    <TextBlock Text="Diagnostic Booking Management"
+                               Foreground="#91A9BB"
+                               FontSize="10"/>
+
+                </StackPanel>
+
+            </Grid>
+
+        </Border>
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Column="1"
+              RowDefinitions="Auto,*"
+              Margin="32">
+
+            <!-- HEADER -->
+            <Border Grid.Row="0"
+                    Background="#FFFFFF"
+                    CornerRadius="10"
+                    Padding="24"
+                    Margin="0,0,0,24">
+
+                <StackPanel Spacing="7">
+
+                    <TextBlock Text="{Binding CurrentPageTitle}"
+                               FontSize="27"
+                               FontWeight="Bold"
+                               Foreground="#172C40"/>
+
+                    <TextBlock Text="{Binding CurrentPageDescription}"
+                               FontSize="13"
+                               Foreground="#64748B"/>
+
+                </StackPanel>
+
+            </Border>
+
+            <!-- SERVICE AVAILABILITY -->
+            <Border Grid.Row="1"
+                    Background="#FFFFFF"
+                    CornerRadius="10"
+                    Padding="24">
+
+                <Grid RowDefinitions="Auto,Auto,*">
+
+                    <!-- DATE SELECTION -->
+                    <StackPanel Grid.Row="0"
+                                Spacing="10"
+                                Margin="0,0,0,20">
+
+                        <TextBlock Text="Select Booking Date"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="#172C40"/>
+
+                        <DatePicker SelectedDate="{Binding SelectedDate}"
+                                    HorizontalAlignment="Left"
+                                    Width="220"/>
+
+                        <TextBlock Text="Availability is calculated from confirmed bookings for the selected date."
+                                   FontSize="11"
+                                   Foreground="#64748B"
+                                   TextWrapping="Wrap"/>
+
+                    </StackPanel>
+
+                    <!-- LOADING AND ERROR STATES -->
+                    <StackPanel Grid.Row="1"
+                                Spacing="8"
+                                Margin="0,0,0,15">
+
+                        <TextBlock Text="Loading availability..."
+                                   IsVisible="{Binding IsLoading}"
+                                   Foreground="#2563EB"
+                                   FontWeight="SemiBold"/>
+
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   IsVisible="{Binding HasError}"
+                                   Foreground="#DC2626"
+                                   TextWrapping="Wrap"/>
+
+                    </StackPanel>
+
+                    <!-- AVAILABILITY LIST -->
+                    <ScrollViewer Grid.Row="2"
+                                  VerticalScrollBarVisibility="Auto">
+
+                        <StackPanel Spacing="12">
+
+                            <TextBlock Text="No diagnostic services were found."
+                                       IsVisible="{Binding HasNoAvailability}"
+                                       Foreground="#64748B"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,30"/>
+
+                            <ItemsControl ItemsSource="{Binding AvailabilityItems}">
+
+                                <ItemsControl.ItemTemplate>
+
+                                    <DataTemplate x:DataType="availability:ServiceAvailability">
+
+                                        <Border Background="#F8FAFC"
+                                                BorderBrush="#E2E8F0"
+                                                BorderThickness="1"
+                                                CornerRadius="9"
+                                                Padding="18"
+                                                Margin="0,0,0,5">
+
+                                            <StackPanel Spacing="10">
+
+                                                <TextBlock Text="{Binding ServiceName}"
+                                                           FontSize="16"
+                                                           FontWeight="Bold"
+                                                           Foreground="#172C40"/>
+
+                                                <Grid ColumnDefinitions="*,Auto">
+
+                                                    <StackPanel Grid.Column="0"
+                                                                Spacing="4">
+
+                                                        <TextBlock Text="Daily Capacity"
+                                                                   FontSize="11"
+                                                                   Foreground="#64748B"/>
+
+                                                        <TextBlock Text="{Binding DailyCapacity}"
+                                                                   FontSize="15"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="#172C40"/>
+
+                                                    </StackPanel>
+
+                                                    <StackPanel Grid.Column="1"
+                                                                Spacing="4"
+                                                                HorizontalAlignment="Right">
+
+                                                        <TextBlock Text="Remaining Slots"
+                                                                   FontSize="11"
+                                                                   Foreground="#64748B"/>
+
+                                                        <TextBlock Text="{Binding RemainingCapacity}"
+                                                                   FontSize="22"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="#16765B"
+                                                                   HorizontalAlignment="Right"/>
+
+                                                    </StackPanel>
+
+                                                </Grid>
+
+                                                <StackPanel Orientation="Horizontal"
+                                                            Spacing="5">
+
+                                                    <TextBlock Text="Confirmed bookings:"
+                                                               FontSize="11"
+                                                               Foreground="#64748B"/>
+
+                                                    <TextBlock Text="{Binding ConfirmedCount}"
+                                                               FontSize="11"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#172C40"/>
+
+                                                </StackPanel>
+
+
+												<Border Background="#E8F5F1"
+														CornerRadius="5"
+														Padding="8"
+														HorizontalAlignment="Left">
+
+													<TextBlock Text="{Binding StatusText}"
+															   FontSize="10"
+															   FontWeight="Bold"
+															   Foreground="#16765B"/>
+
+												</Border>
+
+
+											</StackPanel>
+
+                                        </Border>
+
+                                    </DataTemplate>
+
+                                </ItemsControl.ItemTemplate>
+
+                            </ItemsControl>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                </Grid>
+
+            </Border>
+
+        </Grid>
+
+    </Grid>
 
 </Window>

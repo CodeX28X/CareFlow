@@ -9,4 +9,7 @@ public sealed record ServiceAvailability(
     int RemainingCapacity)
 {
     public bool IsAvailable => RemainingCapacity > 0;
+
+    public string StatusText =>
+        IsAvailable ? "Available" : "Fully Booked";
 }
