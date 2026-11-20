@@ -1,4 +1,4 @@
-﻿
+
 using CareFlow.Application.Interfaces;
 using CareFlow.Application.Patients;
 using CareFlow.Infrastructure.Persistence;
@@ -24,7 +24,7 @@ public sealed class PatientQueryService : IPatientQueryService
 
         return await db.Patients
             .AsNoTracking()
-            .OrderBy(p => p.FullName)
+            .OrderBy(p => p.PatientCode)
             .Select(p => new PatientSummary(
                 p.PatientId,
                 p.PatientCode,
